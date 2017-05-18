@@ -4,13 +4,23 @@
   "description": "Dzikie weze studia, elektryczny",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "babel-node --presets es2015 app.js",
+    "watch": "babel -w src/ -d dist/",
+    "build": "babel src/ -d dist/",
+    "serve": "babel -w src/ -d dist/ | nodemon --watch /dist"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "azure": "^2.0.0-preview",
     "azure-storage": "^2.1.0",
+    "babel": "^6.5.2",
+    "babel-cli": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-stage-2": "^6.16.0",
+    "babel-register": "^6.24.1",
+    "nodemon": "^1.11.0",
     "googlemaps": "^1.12.0",
     "mongodb": "^2.2.26"
   }
