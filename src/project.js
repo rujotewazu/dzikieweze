@@ -5,7 +5,7 @@ import sampleTrip from './sample';
 
 const port = process.env.port || 1337;
 const config = {
-key: GOOGLE_MAPS_API_KEY
+    key: GOOGLE_MAPS_API_KEY
 };
 
 let centerFunction = function (geoCoordinates) {
@@ -30,7 +30,7 @@ let centerFunction = function (geoCoordinates) {
 
 let calculateZoom = function (points) {
     let GLOBE_WIDTH = 256,
-        pixelWidth = 1,sw = getMaxGeoPoint(points),
+        pixelWidth = 1, sw = getMaxGeoPoint(points),
         ne = getMinGeoPoint(points),
         west = sw.lon,
         east = ne.lon,
@@ -43,7 +43,7 @@ let calculateZoom = function (points) {
     return Math.round(Math.log(pixelWidth * 360 / angle / GLOBE_WIDTH) / Math.LN2);
 };
 
-let getGeoPoint = function(points, type) {
+let getGeoPoint = function (points, type) {
     let lat = Math[type].apply(Math, points.map(function (o) {
             return o.y;
         })),
@@ -57,14 +57,14 @@ let getGeoPoint = function(points, type) {
     };
 };
 
-let getMinGeoPoint = function(points) {
+let getMinGeoPoint = function (points) {
     return getGeoPoint(points, 'min');
 };
-let getMaxGeoPoint = function(points) {
+let getMaxGeoPoint = function (points) {
     return getGeoPoint(points, 'max');
 };
 
-http.createServer(function (req, res) {
+function urlGenerator() {
     const gmAPI = new GoogleMapsAPI(config);
 
     let waypoints = sampleTrip.features;
@@ -105,8 +105,62 @@ http.createServer(function (req, res) {
             }
         ]
     };
-    let url = gmAPI.staticMap(params);
 
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(`<img src="${url}"/>`);
-}).listen(port);
+    let mapUrl = gmAPI.staticMap(params).replace('https://', 'http://');
+
+    return mapUrl;
+}
+
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
+
+let mapUrl = urlGenerator();
+import azureStorage from 'azure-storage';
+import fs from 'fs';
+
+const blobService = azureStorage.createBlobService('tripappdisks435', 'goOmWqmWbUi6OvMMRuOBKeaGjYuBRI4J0UZGj7LUn4VmgiCGvdOuwvKTuJLdXJpAAm3u7SejQTeiaHUnx5ltHg==');
+
+console.log('map: ', mapUrl);
+
+// let request = require('request').defaults({encoding: null});
+http.get(mapUrl, function (res) {
+    //process exif here
+    // console.log('body', buffer);
+    let imagedata = '';
+    res.setEncoding('binary');
+
+    res.on('data', function (chunk) {
+        imagedata += chunk
+    });
+
+    res.on('end', function () {
+        let hash = guid();
+        let localFilename = `tmp/poster-${hash}.png`;
+        console.log(localFilename);
+
+        fs.writeFile(localFilename, imagedata, 'binary', function (err) {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+
+            console.log('File saved.');
+
+            blobService.createBlockBlobFromLocalFile('posters', localFilename, localFilename, function (error, result, response) {
+                if (!error) {
+                } else {
+                    console.log(`Blob ${localFilename} uploaded`);
+                    fs.unlink(fileName);
+                    fs.unlink(localFilename);
+                }
+            });
+        });
+    });
+});
