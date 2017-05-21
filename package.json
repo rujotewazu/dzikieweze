@@ -13,6 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.16.1",
+    "azure-sb": "^0.10.4",
     "azure-storage": "^2.1.0",
     "babel": "^6.5.2",
     "babel-cli": "^6.16.0",
