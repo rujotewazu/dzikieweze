@@ -2,7 +2,7 @@ export default {
     "type": "My amazing trip",
     "features": [
         {
-            "type": "Gdańsk",
+            "type": "Feature",
             "geometry": {
                 "type": "Point",
                 "coordinates": [
@@ -11,11 +11,11 @@ export default {
                 ]
             },
             "properties": {
-                "prop0": "value0"
+                "name": "Gdańsk"
             }
         },
         {
-            "type": "Toruń",
+            "type": "Feature",
             "geometry": {
                 "type": "Point",
                 "coordinates": [
@@ -24,11 +24,11 @@ export default {
                 ]
             },
             "properties": {
-                "prop0": "value0"
+                "name": "Toruń"
             }
         },
         {
-            "type": "Włocławek",
+            "type": "Feature",
             "geometry": {
                 "type": "Point",
                 "coordinates": [
@@ -37,11 +37,11 @@ export default {
                 ]
             },
             "properties": {
-                "prop0": "value0"
+                "name": "Włocławek"
             }
         },
         {
-            "type": "Warszawa",
+            "type": "Feature",
             "geometry": {
                 "type": "Point",
                 "coordinates": [
@@ -50,11 +50,11 @@ export default {
                 ]
             },
             "properties": {
-                "prop0": "value0"
+                "name": "Warszawa"
             }
         },
         {
-            "type": "Kraków",
+            "type": "Feature",
             "geometry": {
                 "type": "Point",
                 "coordinates": [
@@ -63,7 +63,8 @@ export default {
                 ]
             },
             "properties": {
-                "prop0": "value0"
+                "name": "Kraków",
+                "medias": "https://i1.kwejk.pl/k/obrazki/2011/10/4cdf0935c2d547e74c3addca6104ebd4.jpeg"
             }
         }
     ]

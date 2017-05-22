@@ -1,10 +1,14 @@
 import TripFetcher from "./TripFetcher";
 import GoogleMapsService from "./GoogleMapsService";
-import http from 'http';
+import axios from 'axios';
 import {BLOB_PASS, BLOB_USER} from '../.env';
 import azureStorage from 'azure-storage';
 import fs from 'fs';
 import WaypointsCollection from "./WaypointsCollection";
+
+const TMP_DIRECTORY = 'tmp/';
+const BLOB_CONTAINER = 'posters';
+const API_STORE_URL = '';
 
 export default class QueueHandler {
     constructor() {
@@ -27,10 +31,10 @@ export default class QueueHandler {
 
     saveFile(imageData) {
         let hash = this.guid();
-        let localFilename = `tmp/poster-${hash}.png`;
+        let localFilename = `poster-${hash}.png`;
         console.log(localFilename);
 
-        fs.writeFile(localFilename, imageData, 'binary', err => {
+        fs.writeFile(TMP_DIRECTORY + localFilename, imageData, 'binary', err => {
             if (err) {
                 console.log(err);
                 throw err;
@@ -41,15 +45,18 @@ export default class QueueHandler {
         });
     }
 
-    saveToBlob(localFilename) {
-        this.blobService.createBlockBlobFromLocalFile('posters', localFilename, localFilename, (error, result, response) => {
+    saveToBlob(filename) {
+        let localFilename = TMP_DIRECTORY + filename;
+
+        this.blobService.createBlockBlobFromLocalFile(BLOB_CONTAINER, filename, localFilename, (error, result, response) => {
+            console.log(result);
             if (error || !response.isSuccessful) {
                 console.log(error);
             } else {
-                console.log(`Blob ${localFilename} uploaded`);
-                fs.unlink(localFilename);
+                console.log(`Blob ${filename} uploaded`);
+                // fs.unlink(filename);
 
-                this.successAction(result);
+                this.successAction(result, filename);
             }
         });
     }
@@ -73,8 +80,37 @@ export default class QueueHandler {
         return TripFetcher.fetch(tripId);
     }
 
-    successAction(result) {
-        console.log('Success');
+    successAction(result, blobName) {
+        console.log('Success', result);
+
+        return;
+
+        let blobService = azureStorage.createBlobService();
+
+        let startDate = new Date();
+        let expiryDate = new Date(startDate);
+        let duration = 60 * 24 * 30 * 2;
+        expiryDate.setMinutes(startDate.getMinutes() + duration);
+        startDate.setMinutes(startDate.getMinutes() - 100);
+
+        let sharedAccessPolicy = {
+            AccessPolicy: {
+                Permissions: azureStorage.BlobUtilities.SharedAccessPermissions.READ,
+                Start: startDate,
+                Expiry: expiryDate
+            },
+        };
+
+        let token = blobService.generateSharedAccessSignature(containerName, blobName, sharedAccessPolicy);
+        let sasUrl = blobService.getUrl(BLOB_CONTAINER, blobName, token);
+
+        axios.post(API_STORE_URL, {blob: sasUrl})
+            .then(res => console.log('API Store success'))
+            .catch(error => {
+                console.log('API store fail. Error: ', error);
+
+                throw error;
+            });
     }
 
     fetchMap(waypoints) {

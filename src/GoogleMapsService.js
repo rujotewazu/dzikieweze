@@ -35,10 +35,20 @@ export default class GoogleMapsService {
 
         for (let cord of coordinates.points) {
             let point = `${cord.lat},${cord.lon}`;
+
             pathPoints.push(point);
-            markers.push({
+
+            let marker = {
                 location: point
-            });
+            };
+
+            let media = cord.getFirstMedia();
+
+            if (media) {
+                marker.icon = media;
+            }
+
+            markers.push(marker);
         }
 
         return {

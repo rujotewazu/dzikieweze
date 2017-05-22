@@ -22,7 +22,7 @@ export default class PosterHandler {
                 console.log(error);
             } else {
                 console.log(`Blob ${localFilename} uploaded`);
-                fs.unlink(localFilename);
+                // fs.unlink(localFilename);
 
                 this.successAction(result);
             }
