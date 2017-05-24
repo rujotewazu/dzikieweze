@@ -64,7 +64,9 @@ export default {
             },
             "properties": {
                 "name": "Kraków",
-                "medias": "https://i1.kwejk.pl/k/obrazki/2011/10/4cdf0935c2d547e74c3addca6104ebd4.jpeg"
+                "medias": [
+                    "http://i1.kwejk.pl/k/obrazki/2011/10/4cdf0935c2d547e74c3addca6104ebd4.jpeg"
+                ]
             }
         }
     ]

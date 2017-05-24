@@ -9,7 +9,7 @@ export default class TripFetcher {
     }
 
     static fake() {
-        return axios.get('https://api.myjson.com/bins/u6h5d');
+        return axios.get('https://api.myjson.com/bins/1fgcwp');
     }
 
     static localPoints() {
