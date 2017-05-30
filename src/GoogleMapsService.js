@@ -1,5 +1,5 @@
 import {GOOGLE_MAPS_API_KEY} from "../.env";
-import GoogleMapsAPI from 'googlemaps';
+import GoogleMapsAPI from "googlemaps";
 
 export default class GoogleMapsService {
     constructor() {
@@ -27,6 +27,69 @@ export default class GoogleMapsService {
                 }
             })
         });
+    }
+
+    static max(a, b) {
+        if (a > b) {
+            return a;
+        } else {
+            return b;
+        }
+    }
+
+    static min(a, b) {
+        if (a > b) {
+            return a;
+        } else {
+            return b;
+        }
+    }
+
+    /*
+     * Please note that this function is highly unoptimized
+     */
+    checkForWaypointHighDensity(coordinates, gridSize = 8, maxDensity = 4) {
+
+        // find borders
+        let latMin = 999;
+        let latMax = -999;
+        let lonMin = 999;
+        let lonMax = -999;
+        for (let point of coordinates.points) {
+            latMin = GoogleMapsService.min(latMin, point.lat);
+            latMax = GoogleMapsService.max(latMax, point.lat);
+            lonMin = GoogleMapsService.min(lonMin, point.lon);
+            lonMax = GoogleMapsService.max(lonMax, point.lon);
+        }
+
+        // calculate grid cell size
+        let gridX = (latMax - latMin) / gridSize;
+        let gridY = (lonMax - lonMin) / gridSize;
+
+        // initialize grid
+        let tooHighDensityAreas = [];
+        for (let i = 0; i < gridSize; i++) {
+            for (let j = 0; j < gridSize; j++) {
+                let gridCell = {
+                    latMin:  i * gridX,
+                    latMax:  (i + 1) * gridX,
+                    lonMin:  j * gridY,
+                    lonMax:  (j + 1) * gridY,
+                    density: 0
+                };
+                for (let point of coordinates.points) {
+                    if (point.lat >= gridCell.latMin && point.lat <= gridCell.latMax
+                        && point.lon >= gridCell.lonMin && point.lon <= gridCell.lonMax) {
+                        gridCell.density = gridCell.density + 1;
+                    }
+                }
+                if (gridCell.density >= maxDensity) {
+                    tooHighDensityAreas.push(gridCell);
+                }
+            }
+        }
+
+        return tooHighDensityAreas;
     }
 
     prepareParams(coordinates) {
