@@ -89,4 +89,59 @@ export default class WaypointsCollection {
 
         throw new Error('Item must be instance of Waypoint or GeoJSON Object');
     }
+
+    parseGeoJSON(features) {
+        this.points = [];
+
+        for (let feature of features) {
+            this.parseGemometry(feature.geometry)
+        }
+    }
+
+    parseGemometry(geometry) {
+        if (geometry.hasOwnProperty('type') && geometry.type === 'Point' && geometry.hasOwnProperty('coordinates') && Array.isArray(geometry.coordinates)) {
+            this.points.push(
+                new Waypoint(geometry.coordinates[0], geometry.coordinates[1])
+            );
+
+            return this;
+        }
+        else if (geometry.hasOwnProperty('type') && geometry.hasOwnProperty('coordinates') && Array.isArray(geometry.coordinates)){
+            for (let level1 of geometry.coordinates) {
+                if (Array.isArray(level1[0])) {
+                    for (let level2 of level1) {
+                        if (Array.isArray(level2[0])) {
+                            for (let level3 of level2) {
+                                if (Array.isArray(level3[0])) {
+                                    for (let level4 of level3) {
+                                        // go deeper...
+                                    }
+                                } else {
+                                    this.extractSimpleCoordinates(level2);
+                                    break;
+                                }
+                            }
+                        } else {
+                            this.extractSimpleCoordinates(level1);
+                            break;
+                        }
+                    }
+                } else {
+                    this.extractSimpleCoordinates(geometry.coordinates);
+                    break;
+                }
+            }
+
+            return this;
+        }
+    }
+
+    extractSimpleCoordinates(coordinates){
+        for (let coord of coordinates) {
+            this.points.push(
+                new Waypoint(coord[0], coord[1])
+            );
+        }
+    }
+
 }

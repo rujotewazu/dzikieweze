@@ -19,9 +19,14 @@ export default class QueueHandler {
     process(tripId = null) {
         this.getWaypoints(tripId)
             .then(({data}) => {
-                let tripData = data.tripData,
-                    features = tripData.features;
-                let waypoints = new WaypointsCollection(features);
+                let tripData = data.tripData;
+                if (typeof tripData === 'string') {
+                    tripData = JSON.parse(tripData);
+                }
+
+                let features = tripData.features,
+                    waypoints = new WaypointsCollection();
+                waypoints.parseGeoJSON(features);
 
                 this.fetchMap(waypoints);
             })
@@ -50,6 +55,7 @@ export default class QueueHandler {
     saveToBlob(filename) {
         let localFilename = TMP_DIRECTORY + filename;
 
+        console.log(BLOB_CONTAINER);
         this.blobService.createBlockBlobFromLocalFile(BLOB_CONTAINER, filename, localFilename, (error, result, response) => {
             console.log(result);
             if (error || !response.isSuccessful) {
@@ -103,7 +109,7 @@ export default class QueueHandler {
             },
         };
 
-        let token = blobService.generateSharedAccessSignature(containerName, blobName, sharedAccessPolicy);
+        let token = blobService.generateSharedAccessSignature(BLOB_CONTAINER, blobName, sharedAccessPolicy);
         let sasUrl = blobService.getUrl(BLOB_CONTAINER, blobName, token);
 
         axios.post(API_STORE_URL, {blob: sasUrl})

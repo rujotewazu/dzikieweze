@@ -10,8 +10,10 @@ export default class TripFetcher {
         return axios.get(url);
     }
 
+    // WORKING GENERIC --- http://myjson.com/tnkqx
+    // WORKING API --- https://api.myjson.com/bins/sncqh
     static fake() {
-        return axios.get('https://api.myjson.com/bins/1fgcwp');
+        return axios.get('https://api.myjson.com/bins/sncqh');
     }
 
     static localPoints() {
