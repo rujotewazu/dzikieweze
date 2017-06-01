@@ -8,7 +8,7 @@ import WaypointsCollection from "./WaypointsCollection";
 
 const TMP_DIRECTORY = 'tmp/';
 const BLOB_CONTAINER = 'posters';
-const API_STORE_URL = '';
+const API_STORE_URL = 'http://tripper-api.azurewebsites.net/trips/addTripPoster/';
 
 export default class QueueHandler {
     constructor() {
@@ -23,6 +23,8 @@ export default class QueueHandler {
                 if (typeof tripData === 'string') {
                     tripData = JSON.parse(tripData);
                 }
+
+                this.tripId = tripId;
 
                 let features = tripData.features,
                     waypoints = new WaypointsCollection();
@@ -91,10 +93,6 @@ export default class QueueHandler {
     successAction(result, blobName) {
         console.log('Success', result);
 
-        // return;
-
-        let blobService = azureStorage.createBlobService();
-
         let startDate = new Date();
         let expiryDate = new Date(startDate);
         let duration = 60 * 24 * 30 * 2;
@@ -109,10 +107,12 @@ export default class QueueHandler {
             },
         };
 
-        let token = blobService.generateSharedAccessSignature(BLOB_CONTAINER, blobName, sharedAccessPolicy);
-        let sasUrl = blobService.getUrl(BLOB_CONTAINER, blobName, token);
+        let token = this.blobService.generateSharedAccessSignature(BLOB_CONTAINER, blobName, sharedAccessPolicy);
+        let sasUrl = this.blobService.getUrl(BLOB_CONTAINER, blobName, token);
 
-        axios.post(API_STORE_URL, {blob: sasUrl})
+        console.log('Blobl url: ', sasUrl);
+
+        axios.post(API_STORE_URL + this.tripId, {url: sasUrl})
             .then(res => console.log('API Store success'))
             .catch(error => {
                 console.log('API store fail. Error: ', error);
