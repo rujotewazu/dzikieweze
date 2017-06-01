@@ -16,8 +16,10 @@ sbService.createQueueIfNotExists('poster-request', err => {
                 if (error) {
                     console.log('Error: ', error);
                 } else {
-                    console.log(lockedMessage.body);
-                    queueHandler.process(lockedMessage.body);
+                    let tripId = lockedMessage.body.split('{')[1].split('}')[0];
+
+                    console.log(tripId);
+                    queueHandler.process(tripId);
                     // sbService.deleteMessage(lockedMessage, deleteError => {
                     //     if (deleteError) {
                     //         console.log('Message was not deleted', deleteError);
