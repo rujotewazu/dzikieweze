@@ -91,7 +91,7 @@ export default class QueueHandler {
     successAction(result, blobName) {
         console.log('Success', result);
 
-        return;
+        // return;
 
         let blobService = azureStorage.createBlobService();
 
