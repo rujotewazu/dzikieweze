@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import Canvas from "canvas";
 
+const HEADER_HEIGHT = 50;
 
 export default class PosterCreator {
 
@@ -18,19 +19,16 @@ export default class PosterCreator {
                 title = 'Moja super wycieczka po Polsce!',
                 te = ctx.measureText(title);
 
-            canvas.height = img.height + te.height;
+            canvas.height = img.height + HEADER_HEIGHT;
+
+            ctx.fillRect(0, 0, img.width, img.height + HEADER_HEIGHT);
+
+            let margin = (img.width - te.width) / 2;
 
             ctx.font = '30px Impact';
-            ctx.fillText(title, 50, te.height);
+            ctx.fillText(title, margin, HEADER_HEIGHT - 10);
 
-            ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-            ctx.beginPath();
-            ctx.lineTo(50, te.height);
-            ctx.lineTo(50 + te.width, te.height);
-            ctx.stroke();
-
-
-            ctx.drawImage(img, 0, te.height, img.width, img.height);
+            ctx.drawImage(img, 0, HEADER_HEIGHT, img.width, img.height);
 
             // strip off the data: url prefix to get just the base64-encoded bytes
             let data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, ""),
