@@ -19,7 +19,9 @@ export default class QueueHandler {
     process(tripId = null) {
         this.getWaypoints(tripId)
             .then(({data}) => {
-                let waypoints = new WaypointsCollection(data.features);
+                let tripData = data.tripData,
+                    features = tripData.features;
+                let waypoints = new WaypointsCollection(features);
 
                 this.fetchMap(waypoints);
             })

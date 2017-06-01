@@ -4,7 +4,9 @@ import sampleTrip from './sample.Points';
 import Waypoint from "./Waypoint";
 
 export default class TripFetcher {
-    static fetch(url = '') {
+    static fetch(tripId = '') {
+        let url = 'http://tripper-api.azurewebsites.net/trips/' + tripId;
+
         return axios.get(url);
     }
 

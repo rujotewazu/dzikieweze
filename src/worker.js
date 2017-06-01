@@ -16,7 +16,17 @@ sbService.createQueueIfNotExists('poster-request', err => {
                 if (error) {
                     console.log('Error: ', error);
                 } else {
-                    queueHandler.process(lockedMessage);
+                    console.log(lockedMessage.body);
+                    queueHandler.process(lockedMessage.body);
+                    // sbService.deleteMessage(lockedMessage, deleteError => {
+                    //     if (deleteError) {
+                    //         console.log('Message was not deleted', deleteError);
+                    //
+                    //         throw deleteError;
+                    //     } else {
+                    //         console.log('Message deleted');
+                    //     }
+                    // });
                 }
             }
         );
